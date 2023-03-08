@@ -2,7 +2,7 @@ import com.github.ghik.plainsbt.ProjectGroup
 import sbt.Keys._
 import sbt._
 import sbtghactions.GenerativePlugin.autoImport._
-import sbtghactions.{JavaSpec, RefPredicate}
+import sbtghactions.{GenerativePlugin, JavaSpec, RefPredicate}
 import sbtide.Keys.ideBasePackages
 
 object Telescala extends ProjectGroup("telescala") {
@@ -13,7 +13,7 @@ object Telescala extends ProjectGroup("telescala") {
   override def buildSettings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.13.10",
     organization := "com.github.ghik",
-    homepage := Some(url("https://github.com/ghik/plainsbt")),
+    homepage := Some(url("https://github.com/ghik/telescala")),
     ideBasePackages := Seq("com.github.ghik.telescala"),
 
     githubWorkflowTargetTags ++= Seq("v*"),
@@ -66,7 +66,7 @@ object Telescala extends ProjectGroup("telescala") {
     ),
   )
 
-  lazy val root: Project = mkRootProject.settings(
+  lazy val root: Project = mkRootProject.enablePlugins(GenerativePlugin).settings(
     libraryDependencies ++= Seq(
       "com.avsystem.commons" %% "commons-core" % Versions.AvsCommons,
       compilerPlugin("com.avsystem.commons" %% "commons-core" % Versions.AvsCommons),
