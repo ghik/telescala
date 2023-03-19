@@ -1,4 +1,4 @@
-import com.github.ghik.plainsbt.ProjectGroup
+import com.github.ghik.sbt.nosbt.ProjectGroup
 import sbt.Keys._
 import sbt._
 import sbtghactions.GenerativePlugin.autoImport._
@@ -7,7 +7,7 @@ import sbtide.Keys.ideBasePackages
 
 object Telescala extends ProjectGroup("telescala") {
   object Versions {
-    final val AvsCommons = "2.9.0"
+    final val AvsCommons = "2.9.2"
   }
 
   override def globalSettings: Seq[Def.Setting[_]] = Seq(
@@ -17,12 +17,34 @@ object Telescala extends ProjectGroup("telescala") {
     ),
   )
 
-  override def buildSettings: Seq[Def.Setting[_]] = Seq(
+  override def commonSettings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.13.10",
     organization := "com.github.ghik",
     homepage := Some(url("https://github.com/ghik/telescala")),
     ideBasePackages := Seq("com.github.ghik.telescala"),
 
+    Compile / scalacOptions ++= Seq(
+      "-encoding", "utf-8",
+      "-explaintypes",
+      "-feature",
+      "-deprecation",
+      "-unchecked",
+      "-language:implicitConversions",
+      "-language:existentials",
+      "-language:dynamics",
+      "-language:experimental.macros",
+      "-language:higherKinds",
+      "-Werror",
+      "-Xlint:-missing-interpolator,-adapted-args,-unused,_",
+    ),
+
+    libraryDependencies ++= Seq(
+      "com.avsystem.commons" %% "commons-core" % Versions.AvsCommons,
+      compilerPlugin("com.avsystem.commons" %% "commons-analyzer" % Versions.AvsCommons),
+    ),
+  )
+
+  override def buildSettings: Seq[Def.Setting[_]] = Seq(
     githubWorkflowTargetTags ++= Seq("v*"),
     githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17")),
     githubWorkflowPublishTargetBranches := Seq(RefPredicate.StartsWith(Ref.Tag("v"))),
@@ -56,29 +78,7 @@ object Telescala extends ProjectGroup("telescala") {
         Developer("ghik", "Roman Janusz", "romeqjanoosh@gmail.com", url("https://github.com/ghik"))
       ),
     ),
-
-    Compile / scalacOptions ++= Seq(
-      "-encoding", "utf-8",
-      "-explaintypes",
-      "-feature",
-      "-deprecation",
-      "-unchecked",
-      "-language:implicitConversions",
-      "-language:existentials",
-      "-language:dynamics",
-      "-language:experimental.macros",
-      "-language:higherKinds",
-      "-Werror",
-      "-Xlint:-missing-interpolator,-adapted-args,-unused,_",
-    ),
   )
 
-  lazy val root: Project = mkRootProject.settings(
-    libraryDependencies ++= Seq(
-      "com.avsystem.commons" %% "commons-core" % Versions.AvsCommons,
-      compilerPlugin("com.avsystem.commons" %% "commons-core" % Versions.AvsCommons),
-    ),
-  )
-
-  protected def enumerateSubprojects: Seq[Project] = discoverProjects
+  lazy val root: Project = mkRootProject
 }
